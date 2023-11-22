@@ -58,16 +58,16 @@ const client = new openai_1.OpenAIClient(AZURE_BASE_URL, new openai_1.AzureKeyCr
 function getPRDetails() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
-        const { repository, issue } = JSON.parse((0, fs_1.readFileSync)(process.env.GITHUB_EVENT_PATH || "", "utf8"));
+        const { repository, number } = JSON.parse((0, fs_1.readFileSync)(process.env.GITHUB_EVENT_PATH || "", "utf8"));
         const prResponse = yield octokit.pulls.get({
             owner: repository.owner.login,
             repo: repository.name,
-            pull_number: issue.number,
+            pull_number: number,
         });
         return {
             owner: repository.owner.login,
             repo: repository.name,
-            pull_number: issue.number,
+            pull_number: number,
             title: (_a = prResponse.data.title) !== null && _a !== void 0 ? _a : "",
             description: (_b = prResponse.data.body) !== null && _b !== void 0 ? _b : "",
         };
@@ -93,7 +93,9 @@ function analyzeCode(parsedDiff, prDetails) {
                 continue; // Ignore deleted files
             for (const chunk of file.chunks) {
                 const prompt = createPrompt(file, chunk, prDetails);
+                console.log(prompt);
                 const aiResponse = yield getAIResponse(prompt);
+                console.log(aiResponse);
                 if (aiResponse) {
                     const newComments = createComment(file, chunk, aiResponse);
                     if (newComments) {
