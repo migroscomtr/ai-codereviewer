@@ -29,18 +29,18 @@ interface PRDetails {
 }
 
 async function getPRDetails(): Promise<PRDetails> {
-  const { repository, number } = JSON.parse(
+  const { repository, issue } = JSON.parse(
     readFileSync(process.env.GITHUB_EVENT_PATH || "", "utf8")
   );
   const prResponse = await octokit.pulls.get({
     owner: repository.owner.login,
     repo: repository.name,
-    pull_number: number,
+    pull_number: issue.number,
   });
   return {
     owner: repository.owner.login,
     repo: repository.name,
-    pull_number: number,
+    pull_number: issue.number,
     title: prResponse.data.title ?? "",
     description: prResponse.data.body ?? "",
   };
